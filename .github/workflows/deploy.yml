@@ -19,8 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # Always build the newest commit on main, not the commit that triggered the run.
+      # Runs can start late or out of order; this stops an old run republishing an old version.
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
