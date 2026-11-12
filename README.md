@@ -29,9 +29,10 @@ Note positions (`x`, `y`) are percentages across the image.
 ## Publishing
 
 The site is published to GitHub Pages at https://abijahsimon.github.io/ by `.github/workflows/deploy.yml`.
-The workflow runs on every push to `main`, but on this repository the run has started up to ten minutes
-after the push. Every run publishes the newest commit on `main`, so a late run can never roll the site back.
-To publish straight away, start it by hand:
+The workflow runs on every push to `main` and always publishes the newest commit on `main`, so a late or
+out-of-order run can never roll the site back. (In the first minutes after the repository was created, one
+push run started ten minutes late and two pushes started none; since then runs start within seconds.)
+To start a run by hand:
 
 ```
 gh workflow run deploy.yml --ref main
