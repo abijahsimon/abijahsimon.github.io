@@ -1,0 +1,37 @@
+# Abijah Simon — portfolio site
+
+Static site built with [Astro](https://astro.build). No UI framework; plain CSS and one script.
+
+## Run it
+
+Needs Node 22.23.4 or newer (Node 24 is installed via nvm; `.nvmrc` selects it).
+
+```
+nvm use
+npm run dev      # http://localhost:4321
+npm run build    # writes dist/
+```
+
+## Where things are
+
+| What | Where |
+| --- | --- |
+| All copy, colours, image lists, notes | `src/data/projects.js` |
+| Images (exported, web-ready) | `src/assets/work/` |
+| Home page | `src/pages/index.astro` |
+| Case-study template | `src/pages/work/[slug].astro` |
+| Styles | `src/styles/global.css` |
+| Behaviour (column, cross-section, notes, lightbox) | `src/scripts/site.js` |
+
+To add or change a project, edit `src/data/projects.js`. Images are referenced by file name without the extension.
+Note positions (`x`, `y`) are percentages across the image.
+
+## Publishing
+
+Every push to `main` builds the site and publishes it to GitHub Pages at https://abijahsimon.github.io/
+(see `.github/workflows/deploy.yml`).
+
+## Images
+
+The images in `src/assets/work/` are web-ready exports. The scripts that produce them from the original
+project files are kept outside this repository.

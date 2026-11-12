@@ -1,0 +1,12 @@
+---
+// The image arrangement shown for a project on the home page.
+import Pic from './Pic.astro';
+const { p, eager = false } = Astro.props;
+const c = p.cover;
+const sizes = { web: ['92vw', '18vw'], grid: ['50vw', '50vw', '50vw'], tiles: ['46vw', '46vw', '46vw', '46vw'], map: ['92vw', '34vw'] }[c.layout];
+---
+<div class={`cv ${c.layout} rv`} style={c.cols ? `--cols:${c.cols}` : undefined}>
+  {c.imgs.map((name, i) => (
+    <div class:list={['ph', { w: c.wide === i }]}><Pic name={name} sizes={`(max-width:860px) 92vw, ${sizes[i] ?? '46vw'}`} eager={eager && i === 0} zoom={false} /></div>
+  ))}
+</div>

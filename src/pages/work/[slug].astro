@@ -1,0 +1,62 @@
+---
+import Base from '../../layouts/Base.astro';
+import Pic from '../../components/Pic.astro';
+import Fig from '../../components/Fig.astro';
+import { projects, basement, me } from '../../data/projects.js';
+export function getStaticPaths() { return projects.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
+const { p } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const i = projects.indexOf(p), next = projects[i + 1];
+const hasNotes = p.blocks.some((b) => b.notes || (b.imgs || []).some((m) => m.notes));
+const vars = `--ac:${p.ac};--on:${p.on}${p.hd ? `;--hd:${p.hd}` : ''}`;
+---
+<Base title={p.title.join(' ')} description={p.line} current={p.slug} theme={{ bg: p.bg, fg: p.fg }}>
+  <header class="cs-h" style={vars}>
+    <a class="up mono" href={`${base}#${p.slug}`}>Surface</a>
+    <p class="lab mono"><span>{p.n}</span><span>{p.kind}</span><span>{p.year}</span><span>{p.status}</span></p>
+    <h1 class="ttl" data-w={p.wdth} style={`view-transition-name:t-${p.slug}`}><span set:html={p.title.join('<br>')} /></h1>
+    <div class="intro"><p class="say">{p.line}</p>{p.more && <p class="sub">{p.more}</p>}</div>
+    {p.facts.length > 0 && (
+      <dl class="facts">{p.facts.map(([k, v]) => <div><dt class="mono">{k}</dt><dd>{v}</dd></div>)}</dl>
+    )}
+    {p.link && <a class="live" href={p.link.href} target="_blank" rel="noopener">{p.link.label} <span aria-hidden="true">↗</span></a>}
+  </header>
+
+  <div class="blocks" style={vars}>
+    {p.blocks.map((b, bi) => {
+      if (b.type === 'full') return <Fig m={b} sizes="(max-width:860px) 92vw, 88vw" eager={bi === 0} />;
+      if (b.type === 'row') return (
+        <div class="row rv" style={`--cols:${b.cols}`}>
+          {b.imgs.map((m) => <Fig m={m} sizes="(max-width:860px) 92vw, 46vw" eager={bi === 0} reveal={false} />)}
+        </div>
+      );
+      if (b.type === 'strip') return (
+        <div class="strip rv">{b.imgs.map((m) => <Fig m={m} sizes="60vw" reveal={false} />)}</div>
+      );
+      if (b.type === 'tiles') return (
+        <div class="tiles2 rv">
+          {b.imgs.map((m) => (
+            <figure class="f"><div class="ph" style={`background:${m.bg}`}><Pic name={m.img} alt={m.alt} sizes="(max-width:860px) 80vw, 34vw" /></div><figcaption class="mono">{m.cap}</figcaption></figure>
+          ))}
+        </div>
+      );
+      if (b.type === 'label') return <div class="blk-l"><p><b>{b.t}</b>{b.s && <span class="mono">{b.s}</span>}</p>{b.d && <p class="d">{b.d}</p>}</div>;
+    })}
+  </div>
+
+  {hasNotes && <button class="ntog mono" id="ntog" aria-pressed="false"><span>Notes</span><i></i></button>}
+
+  {next ? (
+    <a class="next" href={`${base}work/${next.slug}/`} style={`--bg:${next.bg};--fg:${next.fg}${next.hd ? `;--hd:${next.hd}` : ''}`}>
+      <svg class="edge" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d={next.edge} /></svg>
+      <p class="lab mono"><span>{next.n}</span><span>{next.kind}</span><span>{next.year}</span><span class="go">Deeper</span></p>
+      <p class="ttl" data-w={next.wdth} data-max="150"><span set:html={next.title.join('<br>')} /></p>
+    </a>
+  ) : (
+    <a class="next" href={`${base}#contact`} style={`--bg:${basement.bg};--fg:${basement.fg}`}>
+      <svg class="edge" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0,34 C240,78 420,8 720,40 S1200,76 1440,30 L1440,80 L0,80Z" /></svg>
+      <p class="lab mono"><span>→</span><span>{me.email}</span><span class="go">Deeper</span></p>
+      <p class="ttl" data-w="140" data-max="150"><span>Contact</span></p>
+    </a>
+  )}
+</Base>

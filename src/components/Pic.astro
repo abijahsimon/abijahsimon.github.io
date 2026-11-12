@@ -1,0 +1,13 @@
+---
+// One image from src/assets/work, optimised and sized. `zoom` makes it open in the lightbox.
+import { Image, getImage } from 'astro:assets';
+const all = import.meta.glob('../assets/work/*.{jpg,png}', { eager: true, import: 'default' });
+const { name, alt = '', sizes = '100vw', eager = false, zoom = true, widths = [480, 800, 1200, 1700, 2400], class: cls = '' } = Astro.props;
+const src = all[`../assets/work/${name}.jpg`] ?? all[`../assets/work/${name}.png`];
+if (!src) throw new Error(`Missing image: ${name}`);
+const ws = widths.filter((w) => w < src.width).concat(src.width);
+const full = zoom ? await getImage({ src, width: Math.min(src.width, 3400), format: 'webp', quality: 82 }) : null;
+---
+<Image src={src} alt={alt} widths={ws} sizes={sizes} format="webp" quality={80}
+  loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} decoding="async"
+  class={cls} data-full={full?.src} data-fw={full?.attributes.width} data-fh={full?.attributes.height} />

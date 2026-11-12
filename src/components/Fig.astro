@@ -1,0 +1,17 @@
+---
+// A captioned image in a case study, with optional notes (hidden until the Notes switch is on).
+import Pic from './Pic.astro';
+const { m, sizes, eager = false, reveal = true } = Astro.props;
+---
+<figure class:list={['f', { rv: reveal }]}>
+  <div class:list={['ph', { crop: m.crop }]} style={m.crop ? `aspect-ratio:${m.crop}` : undefined}>
+    <Pic name={m.img} alt={m.alt} sizes={sizes} eager={eager} />
+    {m.notes?.map((n, i) => (
+      <button class="pin" style={`left:${n.x}%;top:${n.y}%;--i:${i}`} data-n={i + 1} aria-label={`Note ${i + 1}: ${n.t}`}>{i + 1}</button>
+    ))}
+  </div>
+  {m.cap && <figcaption class="mono">{m.cap}</figcaption>}
+  {m.notes && (
+    <ol class="nt">{m.notes.map((n, i) => <li data-n={i + 1}><i>{i + 1}</i><span>{n.t}</span></li>)}</ol>
+  )}
+</figure>

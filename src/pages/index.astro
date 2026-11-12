@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Cover from '../components/Cover.astro';
+import { me, projects, basement } from '../data/projects.js';
+const base = import.meta.env.BASE_URL;
+const beds = projects.map((p) => ({ slug: p.slug, n: p.n, name: p.title.join(' '), c: p.bg, t: p.fg }));
+---
+<Base current="home">
+  <header class="surface" id="top" data-sec="top">
+    <p class="who mono"><span>{me.name}</span><span>{me.title}</span></p>
+    <h1 class="name" aria-label={me.name}><span class="a">Abijah</span><span class="b">Simon</span></h1>
+    <div class="intro"><p class="say">{me.line}</p><p class="sub">{me.sub}</p></div>
+    <div class="xs" data-beds={JSON.stringify(beds)} data-base={basement.bg} aria-hidden="true">
+      <svg viewBox="0 0 1440 340" preserveAspectRatio="none"></svg>
+    </div>
+  </header>
+
+  {projects.map((p, i) => (
+    <a class="layer" id={p.slug} href={`${base}work/${p.slug}/`} data-sec={p.slug}
+       style={`--bg:${p.bg};--fg:${p.fg};--ac:${p.ac};--on:${p.on}${p.hd ? `;--hd:${p.hd}` : ''}`}>
+      <svg class="edge" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d={p.edge} /></svg>
+      <p class="lab mono"><span>{p.n}</span><span>{p.kind}</span><span>{p.year}</span><span>{p.status}</span><span class="go">Open</span></p>
+      <h2 class="ttl" data-w={p.wdth} style={`view-transition-name:t-${p.slug}`}><span set:html={p.title.join('<br>')} /></h2>
+      <p class="lsay">{p.line}</p>
+      <Cover p={p} eager={i === 0} />
+    </a>
+  ))}
+
+  <footer class="base" id="contact" data-sec="contact" style={`--bg:${basement.bg};--fg:${basement.fg}`}>
+    <svg class="edge" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true"><path d="M0,34 C240,78 420,8 720,40 S1200,76 1440,30 L1440,80 L0,80Z" /></svg>
+    <p class="mono">Contact</p>
+    <a class="mail" href={`mailto:${me.email}`}>{me.email}</a>
+    <p>{me.about}</p>
+    <p class="ft mono"><span>{me.name} · {me.title}</span><span>© {new Date().getFullYear()}</span></p>
+  </footer>
+</Base>
