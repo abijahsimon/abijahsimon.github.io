@@ -28,8 +28,13 @@ Note positions (`x`, `y`) are percentages across the image.
 
 ## Publishing
 
-Every push to `main` builds the site and publishes it to GitHub Pages at https://abijahsimon.github.io/
-(see `.github/workflows/deploy.yml`).
+The site is published to GitHub Pages at https://abijahsimon.github.io/ by `.github/workflows/deploy.yml`.
+The workflow is set to run on every push to `main`. If a push does not start a run (check the Actions tab),
+start it by hand:
+
+```
+gh workflow run deploy.yml --ref main
+```
 
 ## Images
 
