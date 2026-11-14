@@ -1,13 +1,23 @@
 ---
-// One image from src/assets/work, optimised and sized. `zoom` makes it open in the lightbox.
+// One image from src/assets/work, optimised and sized.
+// `zoom` makes it open in the lightbox. `fx` is a hover behaviour handled by the script:
+//   "lens"   a round magnifier over the full-resolution image
+//   "scroll" drill down a full-length page capture named by `long`
+//   "slip"   the image breaks along a fault and `label` appears in the gap
 import { Image, getImage } from 'astro:assets';
 const all = import.meta.glob('../assets/work/*.{jpg,png}', { eager: true, import: 'default' });
-const { name, alt = '', sizes = '100vw', eager = false, zoom = true, widths = [480, 800, 1200, 1700, 2400], class: cls = '' } = Astro.props;
-const src = all[`../assets/work/${name}.jpg`] ?? all[`../assets/work/${name}.png`];
+const { name, alt = '', sizes = '100vw', eager = false, zoom = true, fx = null, long = null, label = null, widths = [480, 800, 1200, 1700, 2400], class: cls = '' } = Astro.props;
+const find = (n) => all[`../assets/work/${n}.jpg`] ?? all[`../assets/work/${n}.png`];
+const src = find(name);
 if (!src) throw new Error(`Missing image: ${name}`);
 const ws = widths.filter((w) => w < src.width).concat(src.width);
-const full = zoom ? await getImage({ src, width: Math.min(src.width, 3400), format: 'webp', quality: 82 }) : null;
+const full = zoom || fx === 'lens' ? await getImage({ src, width: Math.min(src.width, 3400), format: 'webp', quality: 82 }) : null;
+const longSrc = fx === 'scroll' && long ? find(long) : null;
+if (fx === 'scroll' && !longSrc) throw new Error(`Missing full-length capture: ${long}`);
+const longImg = longSrc ? await getImage({ src: longSrc, width: Math.min(longSrc.width, 1440), format: 'webp', quality: 72 }) : null;
 ---
 <Image src={src} alt={alt} widths={ws} sizes={sizes} format="webp" quality={80}
   loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} decoding="async"
-  class={cls} data-full={full?.src} data-fw={full?.attributes.width} data-fh={full?.attributes.height} />
+  class={cls} data-zoom={zoom ? '' : undefined} data-full={full?.src} data-fw={full?.attributes.width} data-fh={full?.attributes.height}
+  data-fx={fx ?? undefined} data-long={longImg?.src} data-lr={longSrc ? (longSrc.height / longSrc.width).toFixed(4) : undefined}
+  data-label={fx === 'slip' && label ? label : undefined} />

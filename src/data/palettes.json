@@ -1,0 +1,385 @@
+{
+ "coleman": [
+  "#0A2037",
+  "#FDF9ED",
+  "#CFC9C2",
+  "#A77F4B",
+  "#BEA793"
+ ],
+ "diy-build": [
+  "#FFFFFF",
+  "#262B63",
+  "#868B9D",
+  "#A89462",
+  "#4E516E"
+ ],
+ "diy-card": [
+  "#203970",
+  "#101732",
+  "#DC9756",
+  "#3B73AB",
+  "#50BEE4"
+ ],
+ "diy-guide-02": [
+  "#FFFFFF",
+  "#9296A3",
+  "#252B3E",
+  "#F9D23A",
+  "#AA912E"
+ ],
+ "diy-guide-03": [
+  "#FFFFFF",
+  "#7D838A",
+  "#72705D",
+  "#3C4251",
+  "#D1BF83"
+ ],
+ "diy-home": [
+  "#FFFFFF",
+  "#252B68",
+  "#C89255",
+  "#3A6985",
+  "#AA6D37"
+ ],
+ "diy-live": [
+  "#000000",
+  "#2E221E",
+  "#334259",
+  "#7F6342",
+  "#5E2D23"
+ ],
+ "diy-parts": [
+  "#FFFFFF",
+  "#252B69",
+  "#4073A3",
+  "#7191B0",
+  "#ECD786"
+ ],
+ "diy-quickstart": [
+  "#FFFFFF",
+  "#F5711E",
+  "#FCD530",
+  "#9CC3D6",
+  "#F29355"
+ ],
+ "dunes-workshop": [
+  "#FFFFFF",
+  "#F4EDD3",
+  "#12323F",
+  "#9F552E",
+  "#C28749"
+ ],
+ "dunes": [
+  "#FFFFFF",
+  "#9C867B",
+  "#ADAAAA",
+  "#C39C6E",
+  "#7E6C5D"
+ ],
+ "epss-archive": [
+  "#FBFAF6",
+  "#060B11",
+  "#8C7A68",
+  "#433827",
+  "#6885B9"
+ ],
+ "epss-deeptime": [
+  "#060B11",
+  "#FBFAF6",
+  "#122C41",
+  "#CBD1D5",
+  "#A2ACB3"
+ ],
+ "epss-home": [
+  "#5A6972",
+  "#75A1BD",
+  "#12181E",
+  "#ACC2C9",
+  "#314350"
+ ],
+ "epss-past": [
+  "#FBFAF6",
+  "#000101",
+  "#8D9DA8",
+  "#715E56",
+  "#452F2D"
+ ],
+ "epss-shirt": [
+  "#000000",
+  "#FFFFFF",
+  "#404040",
+  "#C8C8C8",
+  "#1E1E1E"
+ ],
+ "epss-story-m": [
+  "#FBFAF6",
+  "#41484F",
+  "#DBDCDA",
+  "#B2B4B6",
+  "#83888B"
+ ],
+ "epss-story": [
+  "#FBFAF6",
+  "#5F4F48",
+  "#836B60",
+  "#798592",
+  "#292A2F"
+ ],
+ "epss-toc": [
+  "#EFF4F8",
+  "#101920",
+  "#83776C",
+  "#B4A394",
+  "#3E3C38"
+ ],
+ "epss19-cover": [
+  "#030406",
+  "#942A3D",
+  "#3D1A24",
+  "#C93E4B",
+  "#BA6364"
+ ],
+ "epss19-spread3": [
+  "#F8D00C",
+  "#BB944B",
+  "#7C7054",
+  "#200D0D",
+  "#492D24"
+ ],
+ "epss19-spread5": [
+  "#4078DF",
+  "#99876B",
+  "#C9AD8D",
+  "#6B5146",
+  "#275EB8"
+ ],
+ "epss19-spread7": [
+  "#137BB8",
+  "#F7CF0D",
+  "#3F90C0",
+  "#E8DB8C",
+  "#253444"
+ ],
+ "epss20-cover": [
+  "#999491",
+  "#5A4C40",
+  "#292522",
+  "#050406",
+  "#86726E"
+ ],
+ "epss20-spread10": [
+  "#FFFFFF",
+  "#137BB8",
+  "#8F6B62",
+  "#2F3F5B",
+  "#71453D"
+ ],
+ "epss20-spread4": [
+  "#FFFFFF",
+  "#C36428",
+  "#86637D",
+  "#A9B786",
+  "#010001"
+ ],
+ "epss20-spread7": [
+  "#000000",
+  "#005C85",
+  "#9E8775",
+  "#625047",
+  "#638F9F"
+ ],
+ "eyu-boothlist": [
+  "#FFFFFF",
+  "#95BCD2",
+  "#C0D8E6",
+  "#799285",
+  "#F2F1C8"
+ ],
+ "eyu-flyer": [
+  "#FFFFFF",
+  "#1B679B",
+  "#F6DD06",
+  "#5C97AE",
+  "#F6E74F"
+ ],
+ "eyu-map": [
+  "#FFFFFF",
+  "#8FC7EB",
+  "#C8DEF5",
+  "#1A83C1",
+  "#3A6780"
+ ],
+ "eyu-passport": [
+  "#B5DAEC",
+  "#FFFFFF",
+  "#0081BF",
+  "#70B6CF",
+  "#3599C1"
+ ],
+ "eyu-savethedate": [
+  "#0E7BB3",
+  "#EFD811",
+  "#7AB2B5",
+  "#A3AD47",
+  "#4395AC"
+ ],
+ "eyu-shirt": [
+  "#127BB5",
+  "#FFFFFF",
+  "#83BCDE",
+  "#EFE136",
+  "#4695B1"
+ ],
+ "hao-home": [
+  "#FFFFFF",
+  "#060B1F",
+  "#1A254B",
+  "#E0E2E4",
+  "#565364"
+ ],
+ "hao-mobile": [
+  "#FFFFFF",
+  "#050A1D",
+  "#D8DBDE",
+  "#69717E",
+  "#232744"
+ ],
+ "hao-pubs": [
+  "#FFFFFF",
+  "#030615",
+  "#D9E0E5",
+  "#8C949D",
+  "#1F2330"
+ ],
+ "hao-research": [
+  "#FFFFFF",
+  "#030615",
+  "#C5CBD0",
+  "#666B75"
+ ],
+ "hao-team": [
+  "#F0F4F5",
+  "#030615",
+  "#748094",
+  "#485E83",
+  "#1A2B46"
+ ],
+ "phd-faults": [
+  "#D7DFCF",
+  "#DE948F",
+  "#B1AFA5",
+  "#FEFEFE",
+  "#A17973"
+ ],
+ "phd-map-main": [
+  "#B593B4",
+  "#E8B5C5",
+  "#D95E4B",
+  "#7EB486",
+  "#D78B7B"
+ ],
+ "phd-minshan": [
+  "#ECB9D0",
+  "#CF8186",
+  "#D29AAE",
+  "#83AA98",
+  "#B65D5D"
+ ],
+ "phd-profile-1": [
+  "#FFFFFF",
+  "#BBC49B",
+  "#7B5651",
+  "#B57756",
+  "#E9B8D0"
+ ],
+ "phd-restoration-1": [
+  "#FFFFFF",
+  "#7E554D",
+  "#BA744F",
+  "#545FA0",
+  "#AF8697"
+ ],
+ "phd-restoration-3": [
+  "#FFFFFF",
+  "#F5B5D2",
+  "#B492B8",
+  "#36A690",
+  "#CE8193"
+ ],
+ "phd-schematic": [
+  "#FFFFFF",
+  "#C1C4AE",
+  "#848589",
+  "#C5505D",
+  "#C98A8C"
+ ],
+ "phd-topo": [
+  "#FFFFFF",
+  "#B9B9B9",
+  "#8C8C8C",
+  "#DCDADA",
+  "#B37172"
+ ],
+ "phd-wedge": [
+  "#FFFFFF",
+  "#E57464",
+  "#F2B7D3",
+  "#B1807B",
+  "#5564A5"
+ ],
+ "polarspark-cover": [
+  "#030406",
+  "#8A8779",
+  "#252C31",
+  "#454D50",
+  "#C6C3AD"
+ ],
+ "polarspark": [
+  "#FFFFFF",
+  "#A3C8E1",
+  "#6DA0C7",
+  "#CEDEEC",
+  "#2F6EA9"
+ ],
+ "results-full": [
+  "#F6F3EC",
+  "#AA9A82",
+  "#D9D8D1",
+  "#C0B9AB",
+  "#715F47"
+ ],
+ "results-home": [
+  "#F7F3EA",
+  "#BE9F80",
+  "#6D512B",
+  "#97714D",
+  "#3B3122"
+ ],
+ "results-method": [
+  "#EFF0EA",
+  "#ABACA4",
+  "#7A786C",
+  "#CECFC8"
+ ],
+ "results-mobile": [
+  "#F7F3EA",
+  "#A37E59",
+  "#8C6038",
+  "#C4A17F",
+  "#594121"
+ ],
+ "watermelon": [
+  "#FFFFFF",
+  "#F74437",
+  "#FC9276",
+  "#C7DC87",
+  "#FA6955"
+ ],
+ "wrexm": [
+  "#FFFFFF",
+  "#000000",
+  "#2174AF",
+  "#A1A1A1",
+  "#5B9CC1"
+ ]
+}

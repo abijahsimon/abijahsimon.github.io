@@ -1,12 +1,38 @@
 ---
-// The image arrangement shown for a project on the home page.
+// The image arrangement shown for a project on the home page, and what each image does on hover:
+//   the website screenshot drills down its full page (when the project has a `long` capture);
+//   print covers listed in `cover.explode` fan out spreads from inside the issue;
+//   otherwise the project's own effect applies (`fx`: lens, legend, slip, or flash where notes exist).
+// Phone overlays stay still.
 import Pic from './Pic.astro';
+import Legend from './Legend.astro';
+import { notesFor, captionOf } from '../data/projects.js';
 const { p, eager = false } = Astro.props;
 const c = p.cover;
 const sizes = { web: ['92vw', '18vw'], grid: ['50vw', '50vw', '50vw'], tiles: ['46vw', '46vw', '46vw', '46vw'], map: ['92vw', '34vw'] }[c.layout];
+const main = c.layout === 'web' ? 0 : c.wide;
+const fxOf = (i) => {
+  if (c.long && i === main) return 'scroll';
+  if (c.layout === 'web') return null;
+  if (c.explode?.[i]) return 'explode';
+  if (p.fx === 'flash') return notesFor[c.imgs[i]] ? 'flash' : null;
+  return p.fx ?? null;
+};
+const items = c.imgs.map((name, i) => {
+  const fx = fxOf(i);
+  return { name, i, fx, notes: fx === 'flash' ? notesFor[name] : null, layers: fx === 'explode' ? c.explode[i] : null,
+    picFx: ['lens', 'scroll', 'slip'].includes(fx) ? fx : null, size: `(max-width:860px) 92vw, ${sizes[i] ?? '46vw'}` };
+});
 ---
 <div class={`cv ${c.layout} rv`} style={c.cols ? `--cols:${c.cols}` : undefined}>
-  {c.imgs.map((name, i) => (
-    <div class:list={['ph', { w: c.wide === i }]}><Pic name={name} sizes={`(max-width:860px) 92vw, ${sizes[i] ?? '46vw'}`} eager={eager && i === 0} zoom={false} /></div>
+  {items.map((it) => (
+    <div class:list={['ph', { w: c.wide === it.i, ex: !!it.layers }]} data-fl={it.notes ? '' : undefined}>
+      {it.layers?.map((s, k) => <div class="ex-l" style={`--k:${k + 1}`}><Pic name={s} sizes="(max-width:860px) 60vw, 34vw" zoom={false} /></div>)}
+      {it.layers
+        ? <div class="ex-top"><Pic name={it.name} sizes={it.size} eager={eager && it.i === 0} zoom={false} /></div>
+        : <Pic name={it.name} sizes={it.size} eager={eager && it.i === 0} zoom={false} fx={it.picFx} long={c.long} label={captionOf(p, it.name)} />}
+      {it.notes?.map((n, k) => <span class="pin" style={`left:${n.x}%;top:${n.y}%;--i:${k}`} data-n={k + 1} data-t={n.t} aria-hidden="true">{k + 1}</span>)}
+      {it.fx === 'legend' && <Legend name={it.name} type={null} />}
+    </div>
   ))}
 </div>

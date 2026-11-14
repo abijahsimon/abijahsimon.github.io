@@ -2,12 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import Pic from '../../components/Pic.astro';
 import Fig from '../../components/Fig.astro';
-import { projects, basement, me } from '../../data/projects.js';
+import { projects, basement, me, notesFor } from '../../data/projects.js';
 export function getStaticPaths() { return projects.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
 const { p } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const i = projects.indexOf(p), next = projects[i + 1];
-const hasNotes = p.blocks.some((b) => b.notes || (b.imgs || []).some((m) => m.notes));
+const noted = (m) => m.notes || notesFor[m.img];
+const hasNotes = p.blocks.some((b) => b.type !== 'strip' && (noted(b) || (b.imgs || []).some(noted)));
 const vars = `--ac:${p.ac};--on:${p.on}${p.hd ? `;--hd:${p.hd}` : ''}`;
 ---
 <Base title={p.title.join(' ')} description={p.line} current={p.slug} theme={{ bg: p.bg, fg: p.fg }}>
@@ -24,19 +25,19 @@ const vars = `--ac:${p.ac};--on:${p.on}${p.hd ? `;--hd:${p.hd}` : ''}`;
 
   <div class="blocks" style={vars}>
     {p.blocks.map((b, bi) => {
-      if (b.type === 'full') return <Fig m={b} sizes="(max-width:860px) 92vw, 88vw" eager={bi === 0} />;
+      if (b.type === 'full') return <Fig m={b} sizes="(max-width:860px) 92vw, 88vw" eager={bi === 0} fx={p.fx} type={p.type} />;
       if (b.type === 'row') return (
         <div class="row rv" style={`--cols:${b.cols}`}>
-          {b.imgs.map((m) => <Fig m={m} sizes="(max-width:860px) 92vw, 46vw" eager={bi === 0} reveal={false} />)}
+          {b.imgs.map((m) => <Fig m={m} sizes="(max-width:860px) 92vw, 46vw" eager={bi === 0} reveal={false} fx={p.fx} type={p.type} />)}
         </div>
       );
       if (b.type === 'strip') return (
-        <div class="strip rv">{b.imgs.map((m) => <Fig m={m} sizes="60vw" reveal={false} />)}</div>
+        <div class="strip rv">{b.imgs.map((m) => <Fig m={m} sizes="60vw" reveal={false} fx={null} />)}</div>
       );
       if (b.type === 'tiles') return (
         <div class="tiles2 rv">
           {b.imgs.map((m) => (
-            <figure class="f"><div class="ph" style={`background:${m.bg}`}><Pic name={m.img} alt={m.alt} sizes="(max-width:860px) 80vw, 34vw" /></div><figcaption class="mono">{m.cap}</figcaption></figure>
+            <figure class="f"><div class="ph" style={`background:${m.bg}`}><Pic name={m.img} alt={m.alt} sizes="(max-width:860px) 80vw, 34vw" fx={p.fx === 'slip' ? 'slip' : null} label={m.cap} /></div><figcaption class="mono">{m.cap}</figcaption></figure>
           ))}
         </div>
       );

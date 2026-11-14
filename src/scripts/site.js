@@ -4,6 +4,8 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const $ = (s, el = d) => el.querySelector(s);
 const $$ = (s, el = d) => [...el.querySelectorAll(s)];
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;   // a mouse or trackpad: hover effects on
+if (fine) d.documentElement.classList.add('fine');
 
 /* ---------- type fitting ---------- */
 // The name: two lines fitted to one measure, a thin wide bed over a thick compressed one.
@@ -16,18 +18,31 @@ function fitName() {
 const titles = $$('.ttl[data-w]');
 function fitTitles() {
   titles.forEach((h) => {
-    const s = h.firstElementChild; h.style.setProperty('--w', h.dataset.w); h.style.fontSize = '100px';
+    // measure with the width transition off, or the title is measured mid-stretch and comes out too large
+    const s = h.firstElementChild; h.style.transition = 'none'; h.style.setProperty('--w', h.dataset.w); h.style.fontSize = '100px';
     const max = +h.dataset.max || 190;
     h.style.fontSize = Math.min(max, 100 * h.clientWidth / s.getBoundingClientRect().width * 0.995) + 'px';
+    void h.offsetWidth; h.style.transition = '';
   });
 }
+// Titles arrive compressed and widen as they scroll in. Linked titles (a project on the home page, the
+// "Deeper" link) rest a little short of full width and stretch the rest of the way on hover or focus.
 function stretchTitles() {
   const vh = innerHeight;
   titles.forEach((h) => {
+    const full = +h.dataset.w, link = h.closest('a.layer, a.next');
+    const rest = link ? 50 + (full - 50) * 0.8 : full;
     const p = reduce ? 1 : clamp((vh - h.getBoundingClientRect().top) / (vh * 0.62), 0, 1);
-    h.style.setProperty('--w', 50 + (h.dataset.w - 50) * (1 - Math.pow(1 - p, 3)));
+    h.style.setProperty('--w', link && link.classList.contains('hot') ? full : 50 + (rest - 50) * (1 - Math.pow(1 - p, 3)));
   });
 }
+$$('a.layer, a.next').forEach((a) => {
+  const set = (on) => { a.classList.toggle('hot', on); stretchTitles(); };
+  a.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') set(true); });
+  a.addEventListener('pointerleave', () => set(false));
+  a.addEventListener('focus', () => { if (a.matches(':focus-visible')) set(true); });
+  a.addEventListener('blur', () => set(false));
+});
 
 /* ---------- the column ---------- */
 const rail = $('#rail'), marker = $('#marker'), idx = $('#idx');
@@ -89,8 +104,33 @@ function crossSection(el) {
   const hz = mk('path', { class: 'hz' }); g.appendChild(hz);          // bedding contacts only, so an unbroken bed shows no future fault
   const oldFault = mk('path', { class: 'fault old' }), fault = mk('path', { class: 'fault' }); g.appendChild(oldFault); g.appendChild(fault);
   const topo = mk('path', { class: 'topo' }); svg.appendChild(topo);
-  const labels = beds.map((b) => { const a = d.createElement('span'); a.className = 'xs-l mono'; a.style.setProperty('--t', b.t); a.innerHTML = `<b>${b.name}</b><i>${b.n}</i>`; el.appendChild(a); return a; });
-  function hov(i, on) { el.classList.toggle('hov', on); paths[i].classList.toggle('on', on); labels[i].classList.toggle('on', on); }
+  const labels = beds.map((b) => { const a = d.createElement('span'); a.className = 'xs-l mono'; a.style.setProperty('--t', b.f); a.innerHTML = `<b>${b.name}</b><i>${b.n}</i>`; el.appendChild(a); return a; });
+  function hov(i, on) { el.classList.toggle('hov', on); paths[i].classList.toggle('on', on); labels[i].classList.toggle('on', on); if (peek) peek(on ? beds[i] : null); }
+
+  // On hover the project's title stretches wide inside its own bed (the label above, styled in CSS),
+  // and a preview of the project's image trails the cursor. The preview is the image only.
+  const peek = fine ? (() => {
+    const box = d.createElement('div'); box.className = 'peek'; box.setAttribute('aria-hidden', 'true');
+    box.innerHTML = '<img alt="">';
+    d.body.appendChild(box);
+    const img = $('img', box);
+    let x = 0, y = 0, tx = 0, ty = 0, raf = 0, on = false, cur = null, warmed = false;
+    const place = () => {
+      const w = box.offsetWidth, h = box.offsetHeight;
+      let px = tx + 24, py = ty - h - 24;
+      if (px + w > innerWidth - 12) px = tx - w - 24;
+      if (py < 10) py = ty + 28;
+      return [px, py];
+    };
+    function loop() { raf = 0; const [px, py] = place(); x += (px - x) * 0.16; y += (py - y) * 0.16; box.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`; if (on) raf = requestAnimationFrame(loop); }
+    el.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
+    el.addEventListener('pointerenter', () => { if (!warmed) { warmed = true; beds.forEach((b) => { new Image().src = b.img; }); } }, { once: true });
+    return (b) => {
+      if (!b) { on = false; box.classList.remove('on'); cur = null; return; }
+      if (b !== cur) { cur = b; img.src = b.img; box.style.setProperty('--c', b.c); }
+      if (!on) { on = true; box.classList.add('on'); [x, y] = place(); if (!raf) raf = requestAnimationFrame(loop); }
+    };
+  })() : null;
 
   // ---- kinematics (elevation z is positive upward; the floor thrust is z = 0) ----
   const theta = 24 * Math.PI / 180;
@@ -144,6 +184,7 @@ function crossSection(el) {
       f1: [...span(F1.x1, F1.x2, 0).map(([x], k, a) => [x, zU * k / (a.length - 1)]), ...span(F1.x2, F2.x2, zU)] };
     basePath.setAttribute('d', `M${xmin},${yb} L${xmax},${yb} L${xmax},${h + 2} L${xmin},${h + 2}Z`);
     labels.forEach((l, i) => { l.style.top = (yb - (N - 0.5 - i) * TH) + 'px'; });
+    el.style.setProperty('--th', TH + 'px');                            // bed thickness, so the title in the bed can size itself
     measure(); show(); frame();
   }
 
@@ -211,7 +252,7 @@ $$('.rv').forEach((el) => io.observe(el));
 /* ---------- notes ---------- */
 const ntog = $('#ntog');
 if (ntog) {
-  const flip = () => { const on = ntog.getAttribute('aria-pressed') !== 'true'; ntog.setAttribute('aria-pressed', on); d.body.classList.toggle('notes-on', on); };
+  const flip = () => { const on = ntog.getAttribute('aria-pressed') !== 'true'; ntog.setAttribute('aria-pressed', on); d.body.classList.toggle('notes-on', on); d.dispatchEvent(new Event('notes')); };
   ntog.addEventListener('click', flip);
   addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'n' && !e.metaKey && !e.ctrlKey && !e.altKey && !/input|textarea/i.test(e.target.tagName)) flip(); });
   $$('figure.f').forEach((f) => {
@@ -220,6 +261,152 @@ if (ntog) {
       ['pointerenter', 'focus'].forEach((ev) => el.addEventListener(ev, () => set(el.dataset.n, true)));
       ['pointerleave', 'blur'].forEach((ev) => el.addEventListener(ev, () => set(el.dataset.n, false)));
     });
+  });
+}
+
+/* ---------- image hover effects ---------- */
+// Which image gets which effect is decided in the components (see Cover.astro and Fig.astro):
+// drill-down, hand lens, flashlight notes and fault slip are driven here; the map legend and the
+// exploded view are CSS only. Mouse and trackpad only. All stand down while the Notes pins are showing.
+if (fine) {
+  const notesOn = () => d.body.classList.contains('notes-on');
+
+  // Drill down: moving the cursor down a website screenshot scrolls a full-length capture of that page.
+  $$('img[data-fx="scroll"]').forEach((img) => {
+    const ph = img.parentElement, ratio = +img.dataset.lr;
+    let layer = null, thumb = null, cur = 0, tgt = 0, raf = 0;
+    function ensure() {
+      if (layer) return;
+      layer = d.createElement('div'); layer.className = 'dd'; layer.style.backgroundImage = `url("${img.dataset.long}")`;
+      const bar = d.createElement('div'); bar.className = 'dd-bar'; thumb = d.createElement('i'); bar.appendChild(thumb);
+      ph.append(layer, bar);
+    }
+    function paint() {
+      raf = 0; cur += (tgt - cur) * 0.18; if (Math.abs(tgt - cur) < 0.001) cur = tgt;
+      const boxH = ph.clientHeight, longH = ph.clientWidth * ratio, size = clamp(boxH / longH, 0.08, 1) * 100;
+      layer.style.backgroundPositionY = (-(longH - boxH) * cur).toFixed(1) + 'px';
+      thumb.style.height = size + '%'; thumb.style.top = (cur * (100 - size)) + '%';
+      if (cur !== tgt) raf = requestAnimationFrame(paint);
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(paint); };
+    const aim = (e) => { const r = ph.getBoundingClientRect(); tgt = clamp(((e.clientY - r.top) / r.height - 0.1) / 0.8, 0, 1); kick(); };
+    // Starts on the first movement over the image, not only on entering it: after a scroll the cursor can
+    // already be resting on the image, and then no "enter" event arrives.
+    ph.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || notesOn()) return;
+      if (!ph.classList.contains('dd-on')) { ensure(); ph.classList.add('dd-on'); }
+      aim(e);
+    });
+    ph.addEventListener('pointerleave', () => { if (!layer) return; ph.classList.remove('dd-on'); tgt = 0; kick(); });
+  });
+
+  // Hand lens: a round magnifier that shows the full-resolution image under the cursor.
+  const lens = d.createElement('div'); lens.className = 'lens'; lens.setAttribute('aria-hidden', 'true'); d.body.appendChild(lens);
+  let target = null, last = null;
+  // where the bitmap really sits inside the element, allowing for object-fit and object-position
+  function bitmapBox(img) {
+    const r = img.getBoundingClientRect(), cs = getComputedStyle(img), nw = img.naturalWidth || 1, nh = img.naturalHeight || 1;
+    let w = r.width, h = r.height, x = 0, y = 0;
+    if (cs.objectFit === 'cover' || cs.objectFit === 'contain') {
+      const k = cs.objectFit === 'cover' ? Math.max(r.width / nw, r.height / nh) : Math.min(r.width / nw, r.height / nh);
+      w = nw * k; h = nh * k;
+      const [px, py] = cs.objectPosition.split(' ').map((v) => parseFloat(v) / 100);
+      x = (r.width - w) * (isNaN(px) ? 0.5 : px); y = (r.height - h) * (isNaN(py) ? 0.5 : py);
+    }
+    return { left: r.left + x, top: r.top + y, w, h, r };
+  }
+  function hideLens() { target = null; lens.classList.remove('on'); }
+  function moveLens(e) {
+    if (!target) return; last = e;
+    const b = bitmapBox(target);
+    if (e.clientX < b.r.left || e.clientX > b.r.right || e.clientY < b.r.top || e.clientY > b.r.bottom || notesOn()) return hideLens();
+    const D = lens.offsetWidth, z = clamp((+target.dataset.fw || target.naturalWidth) / b.w, 1.7, 3);
+    lens.style.translate = `${e.clientX - D / 2}px ${e.clientY - D / 2}px`;
+    lens.style.backgroundSize = `${b.w * z}px ${b.h * z}px`;
+    lens.style.backgroundPosition = `${D / 2 - (e.clientX - b.left) * z}px ${D / 2 - (e.clientY - b.top) * z}px`;
+  }
+  $$('img[data-fx="lens"]').forEach((img) => {
+    img.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      if (notesOn()) return hideLens();
+      if (target !== img) {            // first movement over this image (see the note on the drill-down above)
+        target = img; lens.style.backgroundImage = `url("${img.dataset.full || img.currentSrc}")`;
+        lens.style.backgroundColor = getComputedStyle(img.parentElement).backgroundColor;
+        lens.classList.add('on');
+      }
+      moveLens(e);
+    });
+    img.addEventListener('pointerleave', hideLens);
+  });
+  addEventListener('scroll', () => { if (target && last) moveLens(last); }, { passive: true });
+
+  // Flashlight notes: the pins stay dark until the cursor's circle of light passes over them, and the
+  // nearest one inside the circle shows its note.
+  $$('.ph[data-fl]').forEach((ph) => {
+    const pins = $$('.pin', ph); if (!pins.length) return;
+    const dim = d.createElement('div'); dim.className = 'fl';
+    const tip = d.createElement('p'); tip.className = 'fl-tip';
+    ph.append(dim, tip);
+    const off = () => { ph.classList.remove('fl-on'); pins.forEach((p) => p.classList.remove('near')); tip.classList.remove('on'); };
+    ph.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      if (notesOn()) return off();
+      const r = ph.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, R = clamp(r.width * 0.22, 80, 170);
+      ph.classList.add('fl-on');
+      ph.style.setProperty('--fx', x.toFixed(0) + 'px'); ph.style.setProperty('--fy', y.toFixed(0) + 'px'); ph.style.setProperty('--fr', R.toFixed(0) + 'px');
+      let best = null, bd = R, bx = 0, by = 0;
+      pins.forEach((p) => {
+        const px = parseFloat(p.style.left) / 100 * r.width, py = parseFloat(p.style.top) / 100 * r.height, dist = Math.hypot(px - x, py - y);
+        p.classList.toggle('near', dist < R);
+        if (dist < bd) { bd = dist; best = p; bx = px; by = py; }
+      });
+      if (!best) return tip.classList.remove('on');
+      if (tip.textContent !== best.dataset.t) tip.textContent = best.dataset.t;
+      const tw = tip.offsetWidth, th = tip.offsetHeight;                  // keep the note inside the frame
+      tip.style.left = clamp(bx + 20, 8, r.width - tw - 8) + 'px';
+      tip.style.top = clamp(by - th / 2, 8, r.height - th - 8) + 'px';
+      tip.classList.add('on');
+    });
+    ph.addEventListener('pointerleave', off);
+  });
+
+  // Fault slip: the image breaks along a dipping fault, the two blocks slip past each other, and the
+  // image's caption appears along the fault, the way fault names are lettered on a map.
+  $$('img[data-fx="slip"]').forEach((img) => {
+    const ph = img.parentElement; let built = false;
+    function build() {
+      built = true;
+      const wrap = d.createElement('div'); wrap.className = 'fs'; wrap.setAttribute('aria-hidden', 'true');
+      wrap.style.setProperty('--tile', getComputedStyle(ph).backgroundColor);
+      ['a', 'b'].forEach((k) => {
+        const half = d.createElement('div'); half.className = 'fs-h fs-' + k;
+        const copy = img.cloneNode(); copy.removeAttribute('data-fx'); copy.removeAttribute('data-zoom'); copy.loading = 'eager'; copy.alt = '';
+        half.appendChild(copy); wrap.appendChild(half);
+      });
+      const label = d.createElement('p'); label.className = 'fs-t mono'; label.textContent = img.dataset.label || ''; wrap.appendChild(label);
+      ph.appendChild(wrap);
+    }
+    function aim() {
+      const r = ph.getBoundingClientRect(), vx = -0.24 * r.width, vy = r.height, L = Math.hypot(vx, vy);
+      const ux = vx / L, uy = vy / L, nx = uy, ny = -ux, gap = clamp(r.width * 0.045, 22, 34) / 2, slip = clamp(r.width * 0.03, 10, 22) / 2;
+      ph.style.setProperty('--ax', (-nx * gap - ux * slip).toFixed(1) + 'px'); ph.style.setProperty('--ay', (-ny * gap - uy * slip).toFixed(1) + 'px');
+      ph.style.setProperty('--bx', (nx * gap + ux * slip).toFixed(1) + 'px'); ph.style.setProperty('--by', (ny * gap + uy * slip).toFixed(1) + 'px');
+      ph.style.setProperty('--rot', (Math.atan2(uy, ux) * 180 / Math.PI - 180).toFixed(1) + 'deg');
+    }
+    ph.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || notesOn() || ph.classList.contains('fs-on')) return;
+      if (!built) build();
+      aim(); void ph.offsetWidth; ph.classList.add('fs-on');
+    });
+    ph.addEventListener('pointerleave', () => ph.classList.remove('fs-on'));
+  });
+
+  // when the Notes pins come on they take over: put every hover effect away
+  d.addEventListener('notes', () => {
+    hideLens();
+    d.querySelectorAll('.dd-on, .fl-on, .fs-on').forEach((ph) => ph.classList.remove('dd-on', 'fl-on', 'fs-on'));
+    d.querySelectorAll('.pin.near').forEach((p) => p.classList.remove('near'));
+    d.querySelectorAll('.fl-tip.on').forEach((t) => t.classList.remove('on'));
   });
 }
 

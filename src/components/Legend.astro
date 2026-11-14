@@ -1,0 +1,14 @@
+---
+// Map-style legend that appears over an image on hover: the image's own colours (sampled by
+// tools/palettes.py into src/data/palettes.json) and, where they are known, its typefaces.
+import palettes from '../data/palettes.json';
+const { name, type = null } = Astro.props;
+const colours = palettes[name] ?? [];
+---
+{colours.length > 0 && (
+  <div class="lg" aria-hidden="true">
+    <p class="lg-h">Colours</p>
+    <ul>{colours.map((c) => <li><i style={`background:${c}`}></i><span class="mono">{c}</span></li>)}</ul>
+    {type && <><p class="lg-h">Type</p><p class="lg-p">{type}</p></>}
+  </div>
+)}

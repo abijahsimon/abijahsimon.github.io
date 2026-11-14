@@ -1,17 +1,26 @@
 ---
-// A captioned image in a case study, with optional notes (hidden until the Notes switch is on).
+// A captioned image in a case study.
+// Notes: pins on the image plus a list under it. They show when the Notes switch is on; where the
+// project uses the flashlight effect they also appear under the cursor as it sweeps the image.
+// `fx` is the project's hover effect; an image with a `long` capture always drills down instead.
 import Pic from './Pic.astro';
-const { m, sizes, eager = false, reveal = true } = Astro.props;
+import Legend from './Legend.astro';
+import { notesFor } from '../data/projects.js';
+const { m, sizes, eager = false, reveal = true, fx = null, type = null } = Astro.props;
+const notes = m.notes ?? notesFor[m.img] ?? null;
+const eff = m.long ? 'scroll' : fx === 'flash' ? (notesFor[m.img] ? 'flash' : null) : fx;
+const picFx = ['lens', 'scroll', 'slip'].includes(eff) ? eff : null;
 ---
 <figure class:list={['f', { rv: reveal }]}>
-  <div class:list={['ph', { crop: m.crop }]} style={m.crop ? `aspect-ratio:${m.crop}` : undefined}>
-    <Pic name={m.img} alt={m.alt} sizes={sizes} eager={eager} />
-    {m.notes?.map((n, i) => (
-      <button class="pin" style={`left:${n.x}%;top:${n.y}%;--i:${i}`} data-n={i + 1} aria-label={`Note ${i + 1}: ${n.t}`}>{i + 1}</button>
+  <div class:list={['ph', { crop: m.crop }]} style={m.crop ? `aspect-ratio:${m.crop}` : undefined} data-fl={eff === 'flash' ? '' : undefined}>
+    <Pic name={m.img} alt={m.alt} sizes={sizes} eager={eager} fx={picFx} long={m.long} label={m.cap} />
+    {notes?.map((n, i) => (
+      <button class="pin" style={`left:${n.x}%;top:${n.y}%;--i:${i}`} data-n={i + 1} data-t={n.t} aria-label={`Note ${i + 1}: ${n.t}`}>{i + 1}</button>
     ))}
+    {eff === 'legend' && <Legend name={m.img} type={type} />}
   </div>
   {m.cap && <figcaption class="mono">{m.cap}</figcaption>}
-  {m.notes && (
-    <ol class="nt">{m.notes.map((n, i) => <li data-n={i + 1}><i>{i + 1}</i><span>{n.t}</span></li>)}</ol>
+  {notes && (
+    <ol class="nt">{notes.map((n, i) => <li data-n={i + 1}><i>{i + 1}</i><span>{n.t}</span></li>)}</ol>
   )}
 </figure>

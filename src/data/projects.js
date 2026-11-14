@@ -2,6 +2,8 @@
 // one short paragraph on its own page (`more`), one sentence per section label (`d`). Nothing longer.
 // Images are file names (without extension) in src/assets/work.
 // `notes` are the opt-in annotations: x / y are percentages across the image.
+// `long` names a full-length page capture: hovering that image scrolls through the whole page.
+// Every other image gets the hand lens on hover.
 
 export const me = {
   name: 'Abijah Simon',
@@ -29,9 +31,10 @@ export const projects = [
       ['Base', 'Helios by HTML5 UP, adapted'],
     ],
     link: { href: 'https://haocao.epss.ucla.edu/', label: 'haocao.epss.ucla.edu' },
-    cover: { layout: 'web', imgs: ['hao-home', 'hao-mobile'] },
+    fx: 'legend',
+    cover: { layout: 'web', long: 'hao-home-long', imgs: ['hao-home', 'hao-mobile'] },
     blocks: [
-      { type: 'full', img: 'hao-home', alt: 'Homepage: a cutaway planet with magnetic field lines beside the name', cap: 'Homepage · live site',
+      { type: 'full', img: 'hao-home', long: 'hao-home-long', alt: 'Homepage: a cutaway planet with magnetic field lines beside the name', cap: 'Homepage · live site',
         notes: [
           { x: 80, y: 40, t: 'A cutaway planet with field lines gives the research a face. An interpretation, not a simulation.' },
           { x: 22, y: 31, t: 'The name in both scripts, in a serif on the dark field.' },
@@ -61,9 +64,12 @@ export const projects = [
       ['Type', 'Newsreader, IBM Plex Sans, IBM Plex Mono'],
     ],
     link: { href: 'https://newsletter.epss.ucla.edu/', label: 'newsletter.epss.ucla.edu' },
-    cover: { layout: 'grid', cols: '1fr 1fr 2.08fr', wide: 2, imgs: ['epss19-cover', 'epss20-cover', 'epss-home'] },
+    fx: 'legend', type: 'Newsreader · IBM Plex Sans · IBM Plex Mono',
+    // `explode`: on the home page, hovering a print cover fans out spreads from inside that issue
+    cover: { layout: 'grid', cols: '1fr 1fr 2.08fr', wide: 2, long: 'epss-home-long', imgs: ['epss19-cover', 'epss20-cover', 'epss-home'],
+      explode: { 0: ['epss19-spread5', 'epss19-spread7', 'epss19-spread3'], 1: ['epss20-spread7', 'epss20-spread4', 'epss20-spread10'] } },
     blocks: [
-      { type: 'full', img: 'epss-home', alt: 'Web edition homepage: serif masthead over a mountain fieldwork photograph', cap: 'Web edition, 2026 · live site · photography by its contributors',
+      { type: 'full', img: 'epss-home', long: 'epss-home-long', alt: 'Web edition homepage: serif masthead over a mountain fieldwork photograph', cap: 'Web edition, 2026 · live site · photography by its contributors',
         notes: [
           { x: 27, y: 44, t: 'Newsreader sets the masthead and the reading text.' },
           { x: 12, y: 28.5, t: 'IBM Plex Mono labels the parts: issue, section, slide count.' },
@@ -108,9 +114,10 @@ export const projects = [
       ['Status', 'Live Squarespace site, plus redesign proposals from November 2026'],
     ],
     link: { href: 'https://diynamics.ucla.edu/', label: 'diynamics.ucla.edu' },
-    cover: { layout: 'grid', cols: '2fr 1fr 1fr', wide: 0, imgs: ['diy-home', 'diy-quickstart', 'diy-guide-02'] },
+    fx: 'flash',
+    cover: { layout: 'grid', cols: '2fr 1fr 1fr', wide: 0, long: 'diy-home-long', imgs: ['diy-home', 'diy-quickstart', 'diy-guide-02'] },
     blocks: [
-      { type: 'full', img: 'diy-home', alt: 'Proposed homepage: A spinning planet. On your tabletop.', cap: 'Proposed homepage · design proposal, not live · photograph shared by Jon Aurnou',
+      { type: 'full', img: 'diy-home', long: 'diy-home-long', alt: 'Proposed homepage: A spinning planet. On your tabletop.', cap: 'Proposed homepage · design proposal, not live · photograph shared by Jon Aurnou',
         notes: [
           { x: 22, y: 42, t: 'The promise in six words.' },
           { x: 17, y: 62, t: 'Two actions only: build a kit, or teach with one.' },
@@ -144,7 +151,8 @@ export const projects = [
       ['Role', 'Positioning, visual direction, copy. Prototyped with AI assistance.'],
       ['Status', 'Private prototype. The form is not connected; the hero photo is a placeholder.'],
     ],
-    cover: { layout: 'grid', cols: '2fr 1fr', wide: 0, imgs: ['results-home', 'results-method'] },
+    fx: 'legend',
+    cover: { layout: 'grid', cols: '2fr 1fr', wide: 0, long: 'results-home-long', imgs: ['results-home', 'results-method'] },
     blocks: [
       { type: 'row', cols: '1fr 1.25fr', imgs: [
         { img: 'results-method', alt: 'YES and NO teaching sequence with line-drawn dogs', cap: 'The teaching sequence',
@@ -153,7 +161,7 @@ export const projects = [
             { x: 9, y: 25, t: 'YES and NO are the only labels. The method reads before the copy does.' },
             { x: 62, y: 27, t: 'One line weight, one accent colour per signal.' },
           ] },
-        { img: 'results-home', alt: 'Prototype homepage in warm beige with a serif headline', cap: 'Prototype homepage · placeholder photo' },
+        { img: 'results-home', long: 'results-home-long', alt: 'Prototype homepage in warm beige with a serif headline', cap: 'Prototype homepage · placeholder photo' },
       ] },
       { type: 'row', cols: '3fr 1fr', imgs: [
         { img: 'results-full', alt: 'The full prototype page', cap: 'Full page', crop: '16/10' },
@@ -173,6 +181,7 @@ export const projects = [
       ['Shown', '2022 materials'],
     ],
     link: { href: 'https://exploringyouruniverse.ucla.edu/', label: 'exploringyouruniverse.ucla.edu' },
+    fx: 'legend',
     cover: { layout: 'grid', cols: '1.7fr 1fr', wide: 0, imgs: ['eyu-map', 'eyu-flyer'] },
     blocks: [
       { type: 'full', img: 'eyu-map', alt: 'Booth map of the UCLA Court of Sciences with legend', cap: 'Booth map, 2022',
@@ -200,6 +209,7 @@ export const projects = [
     line: 'Mission identities, a poster, illustration.',
     more: 'Marks and print pieces for research proposals, a department and a lecture room. The WREXM mark began as AI-generated concepts and was redrawn from scratch in Illustrator.',
     facts: [],
+    fx: 'slip',
     cover: { layout: 'tiles', imgs: ['wrexm', 'polarspark', 'coleman', 'epss-shirt'] },
     blocks: [
       { type: 'tiles', imgs: [
@@ -232,6 +242,7 @@ export const projects = [
       ['Dissertation', 'Structural Geology and Tectonic Evolution of the Eastern Tibetan Plateau'],
       ['Scope', 'New field mapping across about 30,000 km²'],
     ],
+    fx: 'lens',
     cover: { layout: 'map', imgs: ['phd-minshan', 'phd-wedge'] },
     blocks: [
       { type: 'full', img: 'phd-minshan', alt: 'Geologic map of the Min Shan with faults, bedding measurements and earthquake focal mechanisms', cap: 'Geologic map of the Min Shan · new mapping with published sources',
@@ -259,3 +270,43 @@ export const projects = [
 ];
 
 export const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
+
+// Notes attached to an image by name, wherever it appears (home page or case study).
+// Used by the flashlight effect: the pins stay dark until the cursor passes near them.
+// Each note describes something you can see in the image. x / y are percentages across it.
+export const notesFor = {
+  'diy-quickstart': [
+    { x: 9, y: 24, t: 'Four numbered stages, read left to right, then down.' },
+    { x: 12, y: 77, t: 'The QR code opens the full build video.' },
+    { x: 30, y: 88, t: 'The last panel points to what comes next: an experiment.' },
+  ],
+  'diy-guide-02': [
+    { x: 12, y: 22.5, t: 'Every step gives its timestamp in the build video.' },
+    { x: 40, y: 76, t: 'The stack is drawn spaced apart, with every part labelled.' },
+    { x: 75, y: 91, t: 'The one orientation that matters gets a yellow flag.' },
+  ],
+  'diy-guide-03': [
+    { x: 30, y: 43, t: 'A boxed warning about what a later step will need.' },
+    { x: 87, y: 26, t: 'Peg counts are called out on the drawing, not only in the text.' },
+    { x: 40, y: 91, t: 'The page ends with a check before you move on.' },
+  ],
+  'diy-parts': [
+    { x: 50, y: 51, t: 'Two routes side by side: gather the parts, or get a complete kit.' },
+    { x: 22, y: 77, t: 'Costs are stated before any button.' },
+    { x: 18, y: 96, t: 'Each route ends in one clear action.' },
+  ],
+  'diy-build': [
+    { x: 11, y: 30, t: 'The guide adapts to how you got your kit.' },
+    { x: 86, y: 46.5, t: 'Each group can be ticked off, and progress is counted on the left.' },
+    { x: 58, y: 56.5, t: 'Every group links to its moment in the video.' },
+  ],
+};
+
+// The caption a project gives an image, wherever that image is used (for the fault-slip label).
+export const captionOf = (p, name) => {
+  for (const b of p.blocks) {
+    if (b.img === name && b.cap) return b.cap;
+    for (const m of b.imgs || []) if (m.img === name && m.cap) return m.cap;
+  }
+  return '';
+};

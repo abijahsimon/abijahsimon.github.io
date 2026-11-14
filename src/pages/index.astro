@@ -1,9 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import Cover from '../components/Cover.astro';
+import { getImage } from 'astro:assets';
 import { me, projects, basement } from '../data/projects.js';
 const base = import.meta.env.BASE_URL;
-const beds = projects.map((p) => ({ slug: p.slug, n: p.n, name: p.title.join(' '), c: p.bg, t: p.fg }));
+const all = import.meta.glob('../assets/work/*.{jpg,png}', { eager: true, import: 'default' });
+const pic = (n) => all[`../assets/work/${n}.jpg`] ?? all[`../assets/work/${n}.png`];
+// each bed in the cross-section carries what its hover preview needs: an image and the title to stretch
+const beds = await Promise.all(projects.map(async (p) => {
+  const c = p.cover, main = c.layout === 'web' ? 0 : (c.wide ?? 0);
+  const img = await getImage({ src: pic(c.imgs[main]), width: 720, format: 'webp', quality: 76 });
+  return { slug: p.slug, n: p.n, name: p.title.join(' '), lines: p.title, w: Math.min(p.wdth, 132), c: p.bg, t: p.hd ?? p.fg, f: p.fg, img: img.src };
+}));
 ---
 <Base current="home">
   <header class="surface" id="top" data-sec="top">
