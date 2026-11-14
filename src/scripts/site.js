@@ -71,7 +71,7 @@ rail.addEventListener('focusout', () => setTimeout(() => { if (!rail.matches(':f
 // bed length and thickness through the forelimb. The footwall does not move.
 //
 // Two ramps break forward in sequence (the second forms nearer the foreland and carries the first
-// piggyback), and the uplift is eroded as it grows. It plays on its own after the page loads; nothing is random.
+// piggyback), and the uplift is eroded as it grows. Progress follows the scroll position; nothing is random.
 function crossSection(el) {
   const beds = JSON.parse(el.dataset.beds), N = beds.length;
   const svg = $('svg', el), NS = 'http://www.w3.org/2000/svg';
@@ -144,7 +144,7 @@ function crossSection(el) {
       f1: [...span(F1.x1, F1.x2, 0).map(([x], k, a) => [x, zU * k / (a.length - 1)]), ...span(F1.x2, F2.x2, zU)] };
     basePath.setAttribute('d', `M${xmin},${yb} L${xmax},${yb} L${xmax},${h + 2} L${xmin},${h + 2}Z`);
     labels.forEach((l, i) => { l.style.top = (yb - (N - 0.5 - i) * TH) + 'px'; });
-    frame();
+    measure(); show(); frame();
   }
 
   const ease = (p) => p * p * (3 - 2 * p);
@@ -180,22 +180,26 @@ function crossSection(el) {
     fault.style.opacity = clamp(q * 9, 0, 1);
     oldFault.setAttribute('d', s2 > 0 ? 'M' + M.f1.map(([x, z]) => fmt(...advect(F2, x, z, s2))).join('L') : '');
   }
-  // Plays once, slowly, from the moment the page is seen: thrust 1, thrust 2, then erosion. It holds the
-  // final section, pauses while the hero is off screen or the tab is hidden, and is static for reduced motion.
-  const DUR = 26000, DELAY = 900;
-  let elapsed = 0, last = null, raf = 0, visible = true;
-  const qNow = () => (reduce ? 1 : clamp((elapsed - DELAY) / DUR, 0, 1));
-  function frame() { draw(qNow()); }
-  function step(ts) {
-    raf = 0; if (last !== null) elapsed += Math.min(100, ts - last); last = ts; frame();
-    if (qNow() < 1 && visible && !d.hidden) raf = requestAnimationFrame(step); else last = null;
+  // Scrubbed by ordinary page scroll; nothing is pinned. Progress runs from 0 at the top of the page to 1
+  // by the time the section has travelled up to just under the top of the window, so the whole sequence is
+  // seen while the hero scrolls away. Scrolling back up rewinds it, and at the top the beds are flat again.
+  // Progress eases toward the scroll position so a mouse wheel does not jump. Reduced motion: finished, static.
+  let q = reduce ? 1 : 0, raf = 0, dist = 1, forced = null, first = true;
+  function measure() {
+    const top = el.getBoundingClientRect().top + scrollY;                 // where the section starts on the page
+    dist = Math.max(innerHeight * 0.35, top - innerHeight * 0.08);        // scroll distance for the full sequence
   }
-  const play = () => { if (!raf && !reduce && qNow() < 1) { last = null; raf = requestAnimationFrame(step); } };
-  new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) play(); }).observe(el);
-  d.addEventListener('visibilitychange', () => { if (!d.hidden) play(); });
+  const target = () => (forced !== null ? forced : reduce ? 1 : clamp(scrollY / dist, 0, 1));
+  function show() { draw(q); }
+  function tick() {
+    raf = 0; const t = target();
+    q += (t - q) * 0.16; if (Math.abs(t - q) < 0.0006) q = t;
+    show(); if (q !== t) raf = requestAnimationFrame(tick);
+  }
+  function frame() { if (first) { first = false; q = target(); show(); } else if (!raf) raf = requestAnimationFrame(tick); }
   rebuild();
-  const seek = (q) => { elapsed = DELAY + clamp(q, 0, 1) * DUR; frame(); };   // jump to a stage (used by the checking tools)
-  return { frame, rebuild, draw, seek, progress: qNow };
+  const seek = (v) => { forced = v === null ? null : clamp(v, 0, 1); if (forced !== null) q = forced; show(); };  // hold a stage (checking tools); seek(null) releases
+  return { frame, rebuild, draw, seek, progress: () => q };
 }
 const xsEl = $('.xs'); const xs = xsEl ? crossSection(xsEl) : null;
 if (xs) window.__xs = xs; // exposed for checking the model frame by frame
@@ -250,7 +254,7 @@ $$('.strip').forEach((s) => dragScroll(s));
 
 /* ---------- wiring ---------- */
 let tick = false;
-function onScroll() { moveMarker(); stretchTitles(); }
+function onScroll() { moveMarker(); stretchTitles(); if (xs) xs.frame(); }
 addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(() => { onScroll(); tick = false; }); } }, { passive: true });
 function layout() { fitName(); fitTitles(); sizeRail(); if (xs) xs.rebuild(); onScroll(); }
 addEventListener('resize', layout); addEventListener('load', layout);
